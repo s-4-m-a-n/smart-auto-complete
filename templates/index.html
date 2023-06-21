@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <title>auto complete demo</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+        
+        <style>
+            body {
+      background-color: #11141b;
+    }
+
+    .container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .heading {
+      color: #4ecc28;
+      font-size: 54px;
+      margin-bottom: 5px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight:bold;
+    }
+
+    .paragraph {
+      color: #fa9f9f;
+      font-size: 18px;
+      margin-bottom: 50px;
+      font-style: italic;
+    }
+
+    .paragraph2 {
+      color: #fde475;
+      font-size: 15px;
+      margin-top: 40px;
+      font-style: italic;
+    }
+
+    .text-area {
+      width: 100%;
+      height: 120px;
+      font-size: 16px;
+      padding: 10px;
+      background-color: #f8f8f8;
+      border: none;
+      border-radius: 5px;
+      resize: none;
+    }
+   
+          </style>
+    
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="heading">Smart Auto-complete </h1>
+            <p class="paragraph"> Enhancing Nepali News Writing with Intelligent Auto-Complete</p>
+            <textarea type="text" id="autocomplete-input" class="form-control" rows="3", placeholder="Type something..." >माओवादी केन्द्रका अध्यक्ष एवं प्रधानमन्त्री पुष्पकमल दाहाल प्रचण्डले ६ वर्षअघि एमाले र माओवादीबीच एकता गर्नु हतारो भएको टिप्पणी </textarea>
+            
+             <!-- <div class="text-area" contenteditable="true" id="inputTextArea"></div>
+             <div class="autocomplete-suggestions" id="autocompleteSuggestions"></div> -->
+           
+
+            <p class="paragraph2">SmartAutoComplete" is an innovative project designed to revolutionize Nepali news 
+                writing by incorporating intelligent auto-complete functionality. This cutting-edge
+                solution aims to assist journalists, editors, and writers in the creation of high-quality
+             news articles by providing real-time suggestions and completing words or phrases based on context.</p>
+        <div>
+
+          <script>
+            $(document).ready(function() {
+            var typingTimer;
+            var doneTypingInterval = 500; // Delay in milliseconds after user stops typing
+         
+            $('#autocomplete-input').on('input', function() {
+              clearTimeout(typingTimer);
+
+              var textarea = $(this);
+              var query = textarea.val();
+              
+              typingTimer = setTimeout(function() {
+                if (query.trim() !== '') {
+                  sendApiRequest(textarea, query);
+                }
+              }, doneTypingInterval);
+            });
+
+            function sendApiRequest(textarea, query) {
+          
+              $.ajax({
+                url: 'http://127.0.0.1:5000/auto_complete_np',
+                method: 'GET',
+                data: { query: query },
+                success: function(response) {
+                  // Handle the API response as needed
+
+                  var startPos = textarea[0].selectionStart;
+                  var endPos = textarea[0].selectionEnd;
+              
+                  textarea.val(query + response.text); // Append the response to the existing content
+                  textarea[0].setSelectionRange(startPos, startPos + response.text.length); // Select the appended response
+
+                  // Handle removal of response text on non-space key press
+                  textarea.on('keypress', function(event) {
+                    var keyCode = event.keyCode || event.which;
+                    if (keyCode !== 32) { // Check if the pressed key is not a space (ASCII code 32)
+                      var currentText = textarea.val();
+                      var newText = currentText.substring(0, startPos) + currentText.substring(endPos);
+                      textarea.val(newText);
+                    }
+                  });
+
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                  console.log('Error:', errorThrown);
+                }
+              });
+            }
+          });
+
+            </script>
+              
+    </body>
+
+</html>
